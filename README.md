@@ -1,4 +1,4 @@
-# ShopSight 👓
+# ShopSight 
 ### Autonomous Multimodal Order Intake & Notion Human-in-the-Loop Operations Hub
 
 ShopSight is a production-grade automated order intake service for optical clinics and labs. Customers submit orders via Telegram (text messages, voice notes in Hinglish, or photos of prescription slips), Groq AI extracts structured optical parameters, and everything lands in **Notion** where the optometrist reviews, approves, and oversees operations.
@@ -29,7 +29,7 @@ flowchart LR
 
 ---
 
-## ⚡ How It Works
+##  How It Works
 
 1. **Autonomous Intake (24/7)**:
    - A customer sends a voice note, photo, or text (*"Bhai OD -2.00, OS -1.50 single vision blue cut lens chahiye"*) to [@ShopSight_bot](https://t.me/ShopSight_bot).
@@ -50,17 +50,17 @@ flowchart LR
 
 ---
 
-## 🌐 Universal Blueprint Architecture
+##  Universal Blueprint Architecture
 
 Under the hood, ShopSight uses a modular blueprint engine supporting multiple industry schemas:
-* 👓 **Optical Practice (`blueprints/schemas/optical.json`)**: SPH/CYL/AXIS/ADD/PD extraction & progressive gating
-* 🦷 **Dental Practice (`blueprints/schemas/dental.json`)**: Tooth numbers, shade matching (A1/A2), and restoration materials
-* 🚗 **Auto Workshop (`blueprints/schemas/auto_repair.json`)**: Vehicle model, reg plate, parts requisition, and overhaul gating
-* ✂️ **Custom Tailoring (`blueprints/schemas/custom_tailoring.json`)**: Body measurements, fabric code, and cutting tickets
+*  **Optical Practice (`blueprints/schemas/optical.json`)**: SPH/CYL/AXIS/ADD/PD extraction & progressive gating
+*  **Dental Practice (`blueprints/schemas/dental.json`)**: Tooth numbers, shade matching (A1/A2), and restoration materials
+*  **Auto Workshop (`blueprints/schemas/auto_repair.json`)**: Vehicle model, reg plate, parts requisition, and overhaul gating
+*  **Custom Tailoring (`blueprints/schemas/custom_tailoring.json`)**: Body measurements, fabric code, and cutting tickets
 
 ---
 
-## 🚀 Quickstart
+##  Quickstart
 
 ### 1. Clone & Install Dependencies
 ```bash
