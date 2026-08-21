@@ -1,0 +1,53 @@
+{
+  "id": "custom_tailoring",
+  "display_name": "Boutique & Bespoke Tailoring",
+  "industry": "Apparel & Fashion",
+  "description": "Bespoke tailoring intake, body measurements parsing, fabric tracking, and cutting floor job tickets.",
+  "currency": "INR",
+  "currency_symbol": "₹",
+  "pdf_title": "WORKSHOP CUTTING & STITCHING TICKET",
+  "system_instruction_addendum": "Extract bespoke tailoring parameters (Garment Type: Suit/Blazer/Kurta/Sherwani/Lehenga, Body Measurements in inches: Chest, Waist, Length, Shoulder, Sleeve, Fabric Code/Description, Custom Hand Embroidery requirements).",
+  "pdf_table_columns": ["Garment", "Measurements (Chest/Waist/Len)", "Fabric / Color", "Style Details"],
+  "gating_rules": {
+    "min_confidence": 0.85,
+    "max_auto_approve_value": 4500.0,
+    "gated_category_field": "garment_type",
+    "gated_categories": ["bridal_lehenga", "sherwani_handcrafted", "designer_suit"]
+  },
+  "fields": [
+    {
+      "name": "garment_type",
+      "label": "Garment Type",
+      "type": "select",
+      "notion_type": "select",
+      "description": "shirt_trouser, blazer_suit, kurta_pajama, sherwani, dress",
+      "options": [
+        { "name": "Shirt & Trouser", "color": "green" },
+        { "name": "Blazer / 2-Piece Suit", "color": "blue" },
+        { "name": "Kurta Pajama", "color": "yellow" },
+        { "name": "Sherwani Designer", "color": "purple" },
+        { "name": "Custom Dress", "color": "red" }
+      ]
+    },
+    { "name": "measurements_summary", "label": "Key Measurements", "type": "text", "notion_type": "rich_text", "description": "Chest, Waist, Shoulders, Sleeve, Length in inches", "in_pdf_table": true },
+    { "name": "fabric_details", "label": "Fabric & Color", "type": "text", "notion_type": "rich_text", "description": "Linen, Raymond Wool, Silk, Raymond Navy Blue", "in_pdf_table": true },
+    { "name": "delivery_deadline", "label": "Event Date / Deadline", "type": "text", "notion_type": "rich_text", "description": "Target trial / event date" }
+  ],
+  "few_shot_examples": [
+    {
+      "input": "Bhai wedding ke liye 2-piece blazer suit silwana hai. Navy blue Raymond fabric. Chest 40, Waist 34, Length 29, Shoulder 18. Trial date next Saturday. Customer Ankit, 9876500000.",
+      "output": {
+        "customer_name": "Ankit",
+        "customer_phone": "9876500000",
+        "garment_type": "Blazer / 2-Piece Suit",
+        "measurements_summary": "Chest: 40\", Waist: 34\", Length: 29\", Shoulder: 18\"",
+        "fabric_details": "Navy Blue Raymond Wool Blend",
+        "delivery_deadline": "Next Saturday Trial",
+        "urgency": "normal",
+        "estimated_value": 6500.0,
+        "confidence": 0.95,
+        "explanation": "2-piece custom navy blazer suit order with full body measurements for Ankit."
+      }
+    }
+  ]
+}

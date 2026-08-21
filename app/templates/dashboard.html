@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en" class="h-full bg-slate-50">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShopSight — Intelligent Operations & Intake OS</title>
+    
+    <!-- Tailwind CSS with typography & forms -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- FontAwesome 6 Pro-style icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+                        mono: ['"JetBrains Mono"', 'monospace'],
+                    },
+                    boxShadow: {
+                        'subtle': '0 1px 2px 0 rgba(0, 0, 0, 0.03), 0 1px 6px -1px rgba(0, 0, 0, 0.02), 0 2px 4px 0 rgba(0, 0, 0, 0.02)',
+                        'card': '0 0 0 1px rgba(0, 0, 0, 0.04), 0 2px 8px -2px rgba(0, 0, 0, 0.05), 0 8px 16px -4px rgba(0, 0, 0, 0.04)',
+                        'glow-primary': '0 0 20px -5px rgba(37, 99, 235, 0.3)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: '"Plus Jakarta Sans"', sans-serif; }
+        .glass { background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(12px); }
+        .pulse-emerald { animation: pulseEmerald 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        @keyframes pulseEmerald {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(1.25); }
+        }
+        /* Custom scrollbar */
+        ::-webkit-scrollbar { width: 5px; height: 5px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 9999px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="h-full text-slate-800 antialiased selection:bg-blue-600 selection:text-white flex flex-col">
+
+    <!-- Top App Navigation -->
+    <header class="glass sticky top-0 z-40 border-b border-slate-200/80 shadow-xs">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            
+            <!-- Left: Logo & Vertical Badge -->
+            <div class="flex items-center space-x-3.5">
+                <div class="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-700 flex items-center justify-center text-white shadow-md shadow-blue-500/20 ring-1 ring-white/30">
+                    <i class="fa-solid fa-glasses text-sm"></i>
+                </div>
+                <div>
+                    <div class="flex items-center space-x-2">
+                        <span class="font-bold text-slate-900 tracking-tight text-sm sm:text-base">ShopSight</span>
+                        <span class="text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md bg-blue-50 text-blue-700 border border-blue-200/80" id="active-blueprint-badge">
+                            Optical Practice
+                        </span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 font-medium">Autonomous Order Intake & Notion Human-in-the-Loop Hub</p>
+                </div>
+            </div>
+
+            <!-- Center/Right: Actions & Links -->
+            <div class="flex items-center space-x-3">
+                <!-- Live Status Indicator -->
+                <div class="hidden sm:flex items-center space-x-2 px-2.5 py-1 rounded-full bg-slate-100/80 border border-slate-200 text-[11px] font-medium text-slate-600">
+                    <span class="w-2 h-2 rounded-full bg-emerald-500 pulse-emerald"></span>
+                    <span>Service Active</span>
+                </div>
+
+                <!-- Telegram Bot Button -->
+                <a href="https://t.me/ShopSight_bot" target="_blank" class="inline-flex items-center space-x-1.5 px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200/80 text-slate-700 text-xs font-semibold transition border border-slate-200/60">
+                    <i class="fa-brands fa-telegram text-blue-500 text-sm"></i>
+                    <span class="hidden md:inline">@ShopSight_bot</span>
+                </a>
+
+                <!-- Notion Hub Button -->
+                <a href="https://www.notion.so/3c2c7f212b8981dc9109ece7ad150211" target="_blank" class="inline-flex items-center space-x-1.5 px-3.5 py-1.5 rounded-lg bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold transition shadow-sm ring-1 ring-slate-800">
+                    <i class="fa-solid fa-arrow-up-right-from-square text-[10px] text-slate-400"></i>
+                    <span>Open Notion</span>
+                </a>
+
+                <!-- Refresh Button -->
+                <button onclick="refreshData()" class="p-2 rounded-lg bg-white hover:bg-slate-100 text-slate-600 border border-slate-200/80 shadow-xs transition" title="Refresh">
+                    <i class="fa-solid fa-rotate text-xs" id="refresh-icon"></i>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main App Container -->
+    <main class="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+        <!-- Top Stats Row (Linear-Style Metric Cards) -->
+        <section class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Total Orders -->
+            <div class="bg-white rounded-xl p-4 border border-slate-200/80 shadow-card hover:border-slate-300 transition group">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-slate-500 tracking-wide uppercase">Total Orders</span>
+                    <span class="w-7 h-7 rounded-lg bg-slate-100 text-slate-600 flex items-center justify-center text-xs group-hover:bg-blue-50 group-hover:text-blue-600 transition">
+                        <i class="fa-solid fa-inbox"></i>
+                    </span>
+                </div>
+                <div class="text-2xl font-bold text-slate-900 mt-2 font-mono" id="stat-total">--</div>
+                <div class="text-[11px] text-slate-400 mt-1 flex items-center gap-1 font-medium">
+                    <i class="fa-solid fa-bolt text-amber-500 text-[10px]"></i> Synced with Notion
+                </div>
+            </div>
+
+            <!-- Auto-Approved -->
+            <div class="bg-white rounded-xl p-4 border border-slate-200/80 shadow-card hover:border-emerald-200 transition group">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-emerald-600 tracking-wide uppercase">Auto-Approved</span>
+                    <span class="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </span>
+                </div>
+                <div class="text-2xl font-bold text-emerald-600 mt-2 font-mono" id="stat-auto-approved">--</div>
+                <div class="text-[11px] text-slate-400 mt-1 flex items-center gap-1 font-medium">
+                    <span>Standard single-vision</span>
+                </div>
+            </div>
+
+            <!-- Needs Review (Gating) -->
+            <div class="bg-white rounded-xl p-4 border border-slate-200/80 shadow-card hover:border-amber-200 transition group">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-amber-600 tracking-wide uppercase">Needs Approval</span>
+                    <span class="w-7 h-7 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </span>
+                </div>
+                <div class="text-2xl font-bold text-amber-600 mt-2 font-mono" id="stat-needs-approval">--</div>
+                <div class="text-[11px] text-slate-400 mt-1 flex items-center gap-1 font-medium">
+                    <span>Notion Optometrist Gate</span>
+                </div>
+            </div>
+
+            <!-- Ready for Pickup -->
+            <div class="bg-white rounded-xl p-4 border border-slate-200/80 shadow-card hover:border-blue-200 transition group">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-blue-600 tracking-wide uppercase">Ready for Pickup</span>
+                    <span class="w-7 h-7 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-bag-shopping"></i>
+                    </span>
+                </div>
+                <div class="text-2xl font-bold text-blue-600 mt-2 font-mono" id="stat-ready">--</div>
+                <div class="text-[11px] text-slate-400 mt-1 flex items-center gap-1 font-medium">
+                    <span>Lab done & notified</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Two-Column Primary Layout -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+            
+            <!-- Left Column (8 Cols): Orders Queue -->
+            <section class="lg:col-span-8 bg-white rounded-2xl border border-slate-200/80 shadow-card overflow-hidden">
+                <!-- Table Controls Header -->
+                <div class="p-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-50/50">
+                    <div class="flex items-center space-x-2">
+                        <h2 class="text-sm font-bold text-slate-900">Orders Queue</h2>
+                        <span class="text-xs font-mono font-medium px-2 py-0.5 rounded-full bg-slate-200/70 text-slate-600" id="orders-count">0</span>
+                    </div>
+
+                    <!-- Search & Filter Controls -->
+                    <div class="flex items-center space-x-2">
+                        <div class="relative">
+                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-xs text-slate-400"></i>
+                            <input type="text" id="search-input" oninput="filterOrders()" placeholder="Search patient, power..." class="bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-600 w-40 sm:w-48 shadow-2xs">
+                        </div>
+
+                        <!-- Tab-Style Filter -->
+                        <select id="filter-select" onchange="filterOrders()" class="bg-white border border-slate-200 rounded-lg px-2.5 py-1.5 text-xs font-medium text-slate-700 focus:outline-none focus:ring-1 focus:ring-blue-600 shadow-2xs">
+                            <option value="ALL">All Orders</option>
+                            <option value="NEEDS_APPROVAL">Needs Review</option>
+                            <option value="AUTO_APPROVED">Auto-Approved</option>
+                            <option value="READY">Ready</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Sleek Orders Table -->
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs">
+                        <thead class="bg-slate-50/75 border-b border-slate-100 text-slate-400 font-semibold uppercase tracking-wider text-[10px]">
+                            <tr>
+                                <th class="py-3 px-4">Patient / Order ID</th>
+                                <th class="py-3 px-4">Extracted Rx Parameters</th>
+                                <th class="py-3 px-4">Lens & Frame</th>
+                                <th class="py-3 px-4">Status</th>
+                                <th class="py-3 px-4 text-right">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orders-tbody" class="divide-y divide-slate-100/80 font-normal">
+                            <tr>
+                                <td colspan="5" class="py-12 text-center text-slate-400">
+                                    <i class="fa-solid fa-circle-notch fa-spin mr-1.5 text-blue-500"></i> Loading orders from Notion...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Right Column (4 Cols): Live Automation Audit Stream -->
+            <section class="lg:col-span-4 space-y-5">
+                
+                <!-- Live Run Log Card -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-card p-4 space-y-3">
+                    <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+                        <div class="flex items-center space-x-2">
+                            <span class="w-6 h-6 rounded-md bg-blue-50 text-blue-600 flex items-center justify-center text-xs">
+                                <i class="fa-solid fa-clock-rotate-left"></i>
+                            </span>
+                            <h3 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Live Run Log</h3>
+                        </div>
+                        <span class="text-[10px] font-mono text-slate-400">Code-Written Proof</span>
+                    </div>
+
+                    <!-- Scrollable Log Stream -->
+                    <div id="runlog-list" class="space-y-3 max-h-72 overflow-y-auto pr-1">
+                        <div class="text-center py-6 text-slate-400 text-xs">Loading audit trail...</div>
+                    </div>
+                </div>
+
+                <!-- Quick Simulation / Test Bar -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-card p-4 space-y-3">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Pipeline Simulator</h4>
+                        <span class="text-[10px] text-slate-400">Instant AI Ingest</span>
+                    </div>
+                    <div class="space-y-2">
+                        <input type="text" id="quick-test-text" placeholder="Type Hinglish rx (e.g. 'OD -2.00, OS -1.75 single vision')" class="w-full bg-slate-50 border border-slate-200 rounded-lg px-3 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-1 focus:ring-blue-600">
+                        <div class="flex items-center justify-between gap-2">
+                            <span class="text-[10px] text-slate-400 truncate">Or send voice note to Telegram</span>
+                            <button onclick="sendQuickTest()" class="px-3.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition shadow-xs whitespace-nowrap">
+                                Execute Test
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Multi-Industry Ecosystem Switcher -->
+                <div class="bg-white rounded-2xl border border-slate-200/80 shadow-card p-4 space-y-2.5">
+                    <div class="flex items-center justify-between">
+                        <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider">Industry Ecosystem</h4>
+                        <span class="text-[10px] text-slate-400 font-mono">Dynamic Blueprints</span>
+                    </div>
+                    <div id="blueprints-badges" class="grid grid-cols-2 gap-1.5">
+                        <!-- Populated dynamically -->
+                    </div>
+                </div>
+
+            </section>
+        </div>
+
+    </main>
+
+    <!-- PDF Viewer Modal (Sleek Glassmorphic Modal) -->
+    <div id="pdf-modal" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center p-4">
+        <div class="bg-white rounded-2xl w-full max-w-3xl max-h-[88vh] flex flex-col overflow-hidden shadow-2xl border border-slate-200">
+            <div class="p-4 border-b border-slate-100 flex items-center justify-between bg-slate-50/75">
+                <div class="flex items-center space-x-2">
+                    <span class="w-7 h-7 rounded-lg bg-red-50 text-red-600 flex items-center justify-center text-xs">
+                        <i class="fa-solid fa-file-pdf"></i>
+                    </span>
+                    <h4 class="text-xs font-bold text-slate-900" id="pdf-title">Lab Order Slip</h4>
+                </div>
+                <button onclick="closePdf()" class="w-7 h-7 rounded-lg hover:bg-slate-200/80 text-slate-400 hover:text-slate-600 flex items-center justify-center transition">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+            <div class="flex-1 bg-slate-100 p-2 min-h-[480px]">
+                <iframe id="pdf-frame" class="w-full h-full min-h-[480px] rounded-xl border border-slate-200 bg-white" src=""></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Frontend Script -->
+    <script>
+        let ordersData = [];
+        let activeBlueprint = null;
+
+        async function loadData() {
+            try {
+                const res = await fetch('/api/dashboard/stats');
+                const data = await res.json();
+
+                activeBlueprint = data.blueprint;
+
+                if (activeBlueprint) {
+                    document.getElementById('active-blueprint-badge').innerText = activeBlueprint.display_name;
+                }
+
+                // Render available blueprint pills
+                if (data.available_blueprints) {
+                    const badgesContainer = document.getElementById('blueprints-badges');
+                    badgesContainer.innerHTML = data.available_blueprints.map(bp => {
+                        const isCurrent = activeBlueprint && activeBlueprint.id === bp.id;
+                        return `
+                        <button onclick="switchBlueprint('${bp.id}')" class="px-2.5 py-1.5 rounded-lg text-[11px] font-semibold text-left transition border ${isCurrent ? 'bg-blue-600 text-white border-blue-600 shadow-xs' : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200/80'}">
+                            <span class="truncate block">${bp.display_name}</span>
+                        </button>`;
+                    }).join('');
+                }
+
+                document.getElementById('stat-total').innerText = data.counts.total;
+                document.getElementById('stat-auto-approved').innerText = data.counts.auto_approved;
+                document.getElementById('stat-needs-approval').innerText = data.counts.needs_approval;
+                document.getElementById('stat-ready').innerText = data.counts.ready;
+
+                ordersData = data.orders || [];
+                document.getElementById('orders-count').innerText = ordersData.length;
+                renderTable(ordersData);
+                renderRunLogs(data.run_logs || []);
+            } catch (err) {
+                console.error('Error loading dashboard data:', err);
+            }
+        }
+
+        function formatSpecsWidget(order) {
+            if (!activeBlueprint) return '';
+
+            if (activeBlueprint.id === 'optical') {
+                return `
+                <div class="flex items-center space-x-1.5 font-mono text-[11px]">
+                    <span class="px-2 py-0.5 rounded bg-blue-50/80 text-blue-700 font-bold border border-blue-100">OD: ${order.od_sph || '—'}</span>
+                    <span class="px-2 py-0.5 rounded bg-indigo-50/80 text-indigo-700 font-bold border border-indigo-100">OS: ${order.os_sph || '—'}</span>
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1 line-clamp-1 max-w-[280px]">${order.ai_explanation || ''}</div>
+                `;
+            } else if (activeBlueprint.id === 'dental') {
+                return `
+                <div class="flex items-center space-x-1.5 font-mono text-[11px]">
+                    <span class="px-2 py-0.5 rounded bg-teal-50 text-teal-700 font-bold border border-teal-100">Tooth: ${order.tooth_numbers || '—'}</span>
+                    <span class="px-2 py-0.5 rounded bg-amber-50 text-amber-700 font-bold border border-amber-100">Shade: ${order.shade || '—'}</span>
+                </div>
+                <div class="text-[11px] text-slate-400 mt-1 line-clamp-1 max-w-[280px]">${order.ai_explanation || ''}</div>
+                `;
+            } else if (activeBlueprint.id === 'auto_repair') {
+                return `
+                <div class="font-medium text-slate-800 text-xs">${order.vehicle_info || 'Vehicle'}</div>
+                <div class="text-[11px] text-slate-500 font-mono mt-0.5">Parts: ${order.parts_required || 'Standard'}</div>
+                `;
+            } else if (activeBlueprint.id === 'custom_tailoring') {
+                return `
+                <div class="font-medium text-slate-800 text-xs">${order.measurements_summary || 'Measurements'}</div>
+                <div class="text-[11px] text-slate-500 mt-0.5">Fabric: ${order.fabric_details || 'Standard'}</div>
+                `;
+            }
+            return `<div class="font-medium text-slate-800 text-xs">${order.raw_input || ''}</div>`;
+        }
+
+        function formatCategory(order) {
+            if (!activeBlueprint) return 'Single Vision';
+            if (activeBlueprint.id === 'optical') return order.lens_type || 'Single Vision';
+            if (activeBlueprint.id === 'dental') return order.restoration_type || 'Crown';
+            if (activeBlueprint.id === 'auto_repair') return order.service_category || 'Service';
+            if (activeBlueprint.id === 'custom_tailoring') return order.garment_type || 'Garment';
+            return 'Single Vision';
+        }
+
+        function renderTable(orders) {
+            const tbody = document.getElementById('orders-tbody');
+            if (!orders || orders.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" class="py-12 text-center text-slate-400">No orders found in queue.</td></tr>`;
+                return;
+            }
+
+            tbody.innerHTML = orders.map(o => {
+                let badgeClass = 'bg-slate-100 text-slate-700 border-slate-200';
+                if (o.status.includes('Auto-Approved') || o.status.includes('Approved')) {
+                    badgeClass = 'bg-emerald-50 text-emerald-700 border-emerald-200/80';
+                } else if (o.status.includes('Needs Approval')) {
+                    badgeClass = 'bg-amber-50 text-amber-700 border-amber-200/80';
+                } else if (o.status.includes('Ready')) {
+                    badgeClass = 'bg-blue-50 text-blue-700 border-blue-200/80';
+                }
+
+                const isNeedsApproval = o.status.includes('Needs Approval');
+                const isApproved = o.status.includes('Auto-Approved') || o.status === 'Approved' || o.status === 'Approved ✓';
+
+                let actionHtml = `
+                    <button onclick="viewPdf('${o.order_id}')" class="px-2.5 py-1 rounded-md bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-semibold transition text-[11px] inline-flex items-center gap-1 shadow-2xs">
+                        <i class="fa-solid fa-file-pdf text-red-500"></i> Slip
+                    </button>
+                `;
+
+                if (isNeedsApproval) {
+                    actionHtml += `
+                        <button onclick="approveOrder('${o.page_id}')" class="px-2.5 py-1 rounded-md bg-emerald-600 hover:bg-emerald-700 text-white font-semibold transition text-[11px] ml-1 shadow-2xs">
+                            Approve
+                        </button>
+                    `;
+                } else if (isApproved) {
+                    actionHtml += `
+                        <button onclick="readyOrder('${o.page_id}')" class="px-2.5 py-1 rounded-md bg-blue-600 hover:bg-blue-700 text-white font-semibold transition text-[11px] ml-1 shadow-2xs">
+                            Ready
+                        </button>
+                    `;
+                }
+
+                return `
+                <tr class="hover:bg-slate-50/60 transition group">
+                    <td class="py-3 px-4">
+                        <div class="font-bold text-slate-900 group-hover:text-blue-600 transition">${o.customer_name || 'Patient'}</div>
+                        <div class="text-[10px] text-slate-400 font-mono mt-0.5">#${o.order_id}</div>
+                    </td>
+
+                    <td class="py-3 px-4">
+                        ${formatSpecsWidget(o)}
+                    </td>
+
+                    <td class="py-3 px-4 font-medium text-slate-700 capitalize">
+                        <div>${formatCategory(o)}</div>
+                        <div class="text-[10px] text-slate-400 mt-0.5">${o.frame_info || ''}</div>
+                    </td>
+
+                    <td class="py-3 px-4">
+                        <span class="px-2 py-0.5 rounded-md text-[11px] font-semibold border ${badgeClass}">
+                            ${o.status}
+                        </span>
+                    </td>
+
+                    <td class="py-3 px-4 text-right whitespace-nowrap">
+                        ${actionHtml}
+                    </td>
+                </tr>
+                `;
+            }).join('');
+        }
+
+        function renderRunLogs(logs) {
+            const container = document.getElementById('runlog-list');
+            if (!logs || logs.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-4">No events logged yet.</p>`;
+                return;
+            }
+
+            container.innerHTML = logs.map(l => {
+                let icon = 'fa-arrow-right text-blue-500';
+                let bg = 'bg-blue-50';
+                if (l.event_type.includes('approved') || l.event_type.includes('notified')) {
+                    icon = 'fa-check text-emerald-600';
+                    bg = 'bg-emerald-50';
+                } else if (l.event_type.includes('needs_approval')) {
+                    icon = 'fa-shield-halved text-amber-600';
+                    bg = 'bg-amber-50';
+                }
+
+                return `
+                <div class="flex items-start space-x-2.5 text-xs py-1">
+                    <span class="w-5 h-5 rounded-md ${bg} flex items-center justify-center flex-shrink-0 mt-0.5 text-[10px]">
+                        <i class="fa-solid ${icon}"></i>
+                    </span>
+                    <div class="flex-1 min-w-0">
+                        <div class="flex justify-between items-baseline">
+                            <span class="font-semibold text-slate-800 capitalize text-[11px]">${l.event_type.replace('_', ' ')}</span>
+                            <span class="font-mono text-[10px] text-slate-400">${l.timestamp ? new Date(l.timestamp).toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}) : 'Just now'}</span>
+                        </div>
+                        <p class="text-slate-500 text-[11px] truncate mt-0.5">${l.details}</p>
+                    </div>
+                </div>
+                `;
+            }).join('');
+        }
+
+        function filterOrders() {
+            const query = document.getElementById('search-input').value.toLowerCase();
+            const filter = document.getElementById('filter-select').value;
+
+            const filtered = ordersData.filter(o => {
+                const matchesQuery = !query || 
+                    (o.customer_name && o.customer_name.toLowerCase().includes(query)) ||
+                    (o.order_id && o.order_id.toLowerCase().includes(query)) ||
+                    (o.od_sph && o.od_sph.includes(query)) ||
+                    (o.os_sph && o.os_sph.includes(query));
+
+                let matchesFilter = true;
+                if (filter === 'NEEDS_APPROVAL') matchesFilter = o.status.includes('Needs Approval');
+                if (filter === 'AUTO_APPROVED') matchesFilter = o.status.includes('Auto-Approved') || o.status.includes('Approved');
+                if (filter === 'READY') matchesFilter = o.status.includes('Ready');
+
+                return matchesQuery && matchesFilter;
+            });
+
+            renderTable(filtered);
+        }
+
+        async function approveOrder(pageId) {
+            try {
+                await fetch(`/api/order/${pageId}/action?action=approve`, { method: 'POST' });
+                loadData();
+            } catch (err) {
+                alert('Approval failed: ' + err.message);
+            }
+        }
+
+        async function readyOrder(pageId) {
+            try {
+                await fetch(`/api/order/${pageId}/action?action=ready`, { method: 'POST' });
+                loadData();
+            } catch (err) {
+                alert('Action failed: ' + err.message);
+            }
+        }
+
+        async function sendQuickTest() {
+            const input = document.getElementById('quick-test-text');
+            const text = input.value.trim();
+            if (!text) return;
+            input.value = 'Processing through AI...';
+
+            try {
+                await fetch('/api/test/order', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text, customer_name: 'Test Client' })
+                });
+                input.value = '';
+                loadData();
+            } catch (err) {
+                alert('Execution error: ' + err.message);
+                input.value = '';
+            }
+        }
+
+        async function switchBlueprint(blueprintId) {
+            try {
+                const res = await fetch(`/api/blueprints/switch?blueprint_id=${blueprintId}`, { method: 'POST' });
+                if (res.ok) {
+                    refreshData();
+                } else {
+                    const err = await res.json();
+                    alert('Switch failed: ' + err.detail);
+                }
+            } catch (err) {
+                alert('Switch failed: ' + err.message);
+            }
+        }
+
+        function viewPdf(orderId) {
+            document.getElementById('pdf-title').innerText = `Lab Order Slip — #${orderId}`;
+            document.getElementById('pdf-frame').src = `/api/order/${orderId}/pdf`;
+            document.getElementById('pdf-modal').classList.remove('hidden');
+            document.getElementById('pdf-modal').classList.add('flex');
+        }
+
+        function closePdf() {
+            document.getElementById('pdf-modal').classList.add('hidden');
+            document.getElementById('pdf-modal').classList.remove('flex');
+            document.getElementById('pdf-frame').src = '';
+        }
+
+        function refreshData() {
+            const icon = document.getElementById('refresh-icon');
+            icon.classList.add('fa-spin');
+            loadData().finally(() => {
+                setTimeout(() => icon.classList.remove('fa-spin'), 600);
+            });
+        }
+
+        // Initialize & poll
+        loadData();
+        setInterval(loadData, 6000);
+    </script>
+</body>
+</html>

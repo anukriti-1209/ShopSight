@@ -1,0 +1,68 @@
+{
+  "id": "dental",
+  "display_name": "Dental Clinic & Prosthetic Lab",
+  "industry": "Dentistry",
+  "description": "Dental lab prescription intake, crown/bridge/implant restoration specifications, and shade matching.",
+  "currency": "INR",
+  "currency_symbol": "₹",
+  "pdf_title": "DENTAL LAB APPLIANCE PRESCRIPTION",
+  "system_instruction_addendum": "Extract dental restoration parameters (Tooth Numbers FDI/Universal, Restoration Type, Shade/Color Guide code like A2/A3/B1, Material/Zirconia/PFM/Emax, Prep Date, Margin design). Understand Hinglish terms like 'daant number 14 ka crown', 'shade A2 zirconia', 'urgent implant bridge'.",
+  "pdf_table_columns": ["Tooth #", "Restoration", "Material", "Shade", "Margin Design"],
+  "gating_rules": {
+    "min_confidence": 0.85,
+    "max_auto_approve_value": 5000.0,
+    "gated_category_field": "restoration_type",
+    "gated_categories": ["implant", "full_mouth_rehab", "cast_partial_denture"]
+  },
+  "fields": [
+    { "name": "tooth_numbers", "label": "Tooth #(s)", "type": "text", "notion_type": "rich_text", "description": "Tooth numbers e.g. #14, #21, #46, or Upper Anterior", "in_pdf_table": true },
+    {
+      "name": "restoration_type",
+      "label": "Restoration",
+      "type": "select",
+      "notion_type": "select",
+      "description": "crown, bridge, veneer, implant, inlay_onlay, nightguard, denture",
+      "options": [
+        { "name": "Single Crown", "color": "green" },
+        { "name": "Bridge", "color": "blue" },
+        { "name": "Veneer", "color": "purple" },
+        { "name": "Implant Custom", "color": "red" },
+        { "name": "Nightguard / Splint", "color": "yellow" },
+        { "name": "Other", "color": "gray" }
+      ]
+    },
+    {
+      "name": "material",
+      "label": "Material",
+      "type": "select",
+      "notion_type": "select",
+      "description": "Zirconia Multi-layer, E-Max, PFM, Full Metal, PMMA Temporary",
+      "options": [
+        { "name": "Zirconia High Translucency", "color": "blue" },
+        { "name": "E-Max Lithium Disilicate", "color": "purple" },
+        { "name": "PFM (Porcelain Fused to Metal)", "color": "green" },
+        { "name": "Temporary PMMA", "color": "yellow" },
+        { "name": "Standard", "color": "gray" }
+      ]
+    },
+    { "name": "shade", "label": "Shade Guide", "type": "text", "notion_type": "rich_text", "description": "VITA shade e.g. A1, A2, A3, B2, OM3 Bleach", "in_pdf_table": true },
+    { "name": "occlusal_clearance", "label": "Clearance / Notes", "type": "text", "notion_type": "rich_text", "description": "Occlusal staining, margin design (knife edge, chamfer)" }
+  ],
+  "few_shot_examples": [
+    {
+      "input": "Dr. Sharma here for patient Priya. Tooth 21 single crown chahiye in E-Max shade A2, urgent delivery in 2 days.",
+      "output": {
+        "customer_name": "Priya",
+        "customer_phone": null,
+        "tooth_numbers": "21 (Upper Left Central Incisor)",
+        "restoration_type": "Single Crown",
+        "material": "E-Max Lithium Disilicate",
+        "shade": "A2",
+        "urgency": "urgent",
+        "estimated_value": 3500.0,
+        "confidence": 0.95,
+        "explanation": "Single tooth #21 E-max crown requested by Dr. Sharma. Shade A2. Standard single unit."
+      }
+    }
+  ]
+}

@@ -1,0 +1,57 @@
+{
+  "id": "optical",
+  "display_name": "Optical Practice & Lab",
+  "industry": "Optometry",
+  "description": "Optical prescription intake, lens parameter extraction, and lab order dispatch.",
+  "currency": "INR",
+  "currency_symbol": "₹",
+  "pdf_title": "VENDOR LAB ORDER SLIP",
+  "system_instruction_addendum": "Extract optical prescription parameters (OD/OS Sphere, Cylinder, Axis, ADD, Pupillary Distance, Lens Type, Frame). Understand conversational Hinglish such as 'minus do point five right eye mein', 'progressive blue cut lens', 'Titan frame'.",
+  "pdf_table_columns": ["Eye", "SPH", "CYL", "AXIS", "ADD", "PD"],
+  "gating_rules": {
+    "min_confidence": 0.85,
+    "max_auto_approve_value": 3000.0,
+    "gated_category_field": "lens_type",
+    "gated_categories": ["progressive", "bifocal", "custom"]
+  },
+  "fields": [
+    { "name": "od_sph", "label": "OD SPH", "type": "text", "notion_type": "rich_text", "description": "Right eye sphere power, e.g. -2.50 or +1.75", "in_pdf_table": true },
+    { "name": "od_cyl", "label": "OD CYL", "type": "text", "notion_type": "rich_text", "description": "Right eye cylinder power, e.g. -0.75", "in_pdf_table": true },
+    { "name": "od_axis", "label": "OD AXIS", "type": "text", "notion_type": "rich_text", "description": "Right eye cylinder axis degrees (1-180)", "in_pdf_table": true },
+    { "name": "od_add", "label": "OD ADD", "type": "text", "notion_type": "rich_text", "description": "Right eye reading addition power, e.g. +2.00", "in_pdf_table": true },
+    { "name": "os_sph", "label": "OS SPH", "type": "text", "notion_type": "rich_text", "description": "Left eye sphere power, e.g. -2.00", "in_pdf_table": true },
+    { "name": "os_cyl", "label": "OS CYL", "type": "text", "notion_type": "rich_text", "description": "Left eye cylinder power", "in_pdf_table": true },
+    { "name": "os_axis", "label": "OS AXIS", "type": "text", "notion_type": "rich_text", "description": "Left eye cylinder axis degrees", "in_pdf_table": true },
+    { "name": "os_add", "label": "OS ADD", "type": "text", "notion_type": "rich_text", "description": "Left eye reading addition power", "in_pdf_table": true },
+    { "name": "pd", "label": "PD", "type": "text", "notion_type": "rich_text", "description": "Pupillary Distance in mm, e.g. 63", "in_pdf_table": true },
+    {
+      "name": "lens_type",
+      "label": "Lens Type",
+      "type": "select",
+      "notion_type": "select",
+      "description": "single_vision, bifocal, progressive, or custom",
+      "options": [
+        { "name": "Single Vision", "color": "green" },
+        { "name": "Bifocal", "color": "blue" },
+        { "name": "Progressive", "color": "purple" },
+        { "name": "Custom", "color": "orange" },
+        { "name": "Unknown", "color": "gray" }
+      ]
+    },
+    { "name": "frame_info", "label": "Frame Info", "type": "text", "notion_type": "rich_text", "description": "Frame brand, model number, or style specified by customer" }
+  ],
+  "few_shot_examples": [
+    {
+      "input": "Mere liye ek chasma banana hai, minus 2.50 dono aankhon mein, single vision, Titan frame",
+      "output": {
+        "customer_name": null,
+        "customer_phone": null,
+        "od_sph": "-2.50", "od_cyl": null, "od_axis": null, "od_add": null,
+        "os_sph": "-2.50", "os_cyl": null, "os_axis": null, "os_add": null,
+        "pd": null, "lens_type": "single_vision", "frame_info": "Titan",
+        "urgency": "normal", "estimated_value": 1500.0, "confidence": 0.90,
+        "explanation": "Standard single-vision order: OD -2.50, OS -2.50. Titan frame requested."
+      }
+    }
+  ]
+}
