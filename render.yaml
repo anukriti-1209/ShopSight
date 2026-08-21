@@ -19,6 +19,10 @@ services:
         sync: false
       - key: ADMIN_CHAT_ID
         sync: false
+      - key: GROQ_API_KEY
+        sync: false
+      - key: ACTIVE_BLUEPRINT
+        value: "optical"
       - key: GEMINI_API_KEYS
         sync: false
       - key: NOTION_TOKEN
